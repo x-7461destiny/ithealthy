@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:securit="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc.xsd
+						http://code.alibabatech.com/schema/dubbo
+						http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+                     http://www.springframework.org/schema/security
+                     http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+    <!--    配置哪些资源可以匿名访问-->
+    <security:http security="none" pattern="/pages/a.html"></security:http>
+    <security:http security="none" pattern="/css/**"></security:http>
+    <security:http security="none" pattern="/img/**"></security:http>
+    <security:http security="none" pattern="/js/**"></security:http>
+    <security:http security="none" pattern="/plugins/**"></security:http>
+    <!--    auto-config  设置为true，自动配置一些默认配置，比如框架会提供一个登录页面-->
+    <!--    use-expressions 是否使用spring security的表达式-->
+    <!--    pattern /** 表示拦截所有请求-->
+    <!--    access 指定所需的访问角色h或者访问权限-->
+    <securit:http auto-config="true" use-expressions="true">
+        <security:headers>
+<!--            配置在页面可以通过iframe访问受保护的页面，默认是不允许的 - -->
+            <security:frame-options policy="SAMEORIGIN"></security:frame-options>
+        </security:headers>
+        <!--只要认证通过就可以访问-->
+        <security:intercept-url pattern="/pages/**"  access="isAuthenticated()" />
+
+
+        <!--        如果要使用我们自己指定的页面作为登录页面，必须配置登录表单-->
+        <security:form-login
+                login-page="/login.html"
+                username-parameter="username"
+                password-parameter="password"
+                login-processing-url="/login.do"
+                default-target-url="/pages/main.html"
+                authentication-failure-forward-url="/login.html"
+        ></security:form-login>
+        <!--        csrf 对应csrfFilter过滤器-->
+        <!--        disabled  自定义需要关闭此项-->
+        <security:csrf disabled="true"></security:csrf>
+        <!--
+  logout：退出登录
+  logout-url：退出登录操作对应的请求路径
+  logout-success-url：退出登录后的跳转页面
+-->
+        <security:logout logout-url="/logout.do"
+                         logout-success-url="/login.html" invalidate-session="true"/>
+    </securit:http>
+
+    <!--    认证管理器-->
+    <security:authentication-manager>
+        <!--        配置提供者-->
+        <security:authentication-provider user-service-ref="springSecurityUserService">  <!-- 引用注册的userService -->
+            <!--            <security:user-service>-->
+            <!--&lt;!&ndash;                配置一个具体的用户&ndash;&gt;-->
+            <!--                <security:user name="admin" password="{noop}1234" authorities="ROLE_ADMIN"/>-->
+            <!--            </security:user-service>-->
+            <!--            指定对密码加密对象-->
+            <security:password-encoder ref="passwordEncoder"></security:password-encoder>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <bean id="userService" class="com.itheima.service.SpringSecurityUserService"></bean>
+
+    <!-- 配置密码加密 -->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+<!--    &lt;!&ndash; 开始spring注解使用 &ndash;&gt;-->
+<!--    <context:annotation-config></context:annotation-config>-->
+
+
+    <mvc:annotation-driven></mvc:annotation-driven>
+    <context:component-scan base-package="com.itheima.controller"></context:component-scan>
+
+    <!--开启注解方式权限控制-->
+    <security:global-method-security pre-post-annotations="enabled" />
+</beans>

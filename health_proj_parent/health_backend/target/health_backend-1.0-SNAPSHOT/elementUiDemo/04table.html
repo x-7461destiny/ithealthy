@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 引入ElementUI组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-table
+                :data="tableData"
+                style="width: 100%">
+            <el-table-column
+                    prop="date"
+                    label="日期"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="name"
+                    label="姓名"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="address"
+                    label="地址">
+            </el-table-column>
+        </el-table>
+    </template>
+</div>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            tableData:[
+                {data:'2021.10.2',name:'小米',address:'北京'},
+                {data:'2021.1.3',name:'阿里',address:'南京'}
+            ]
+        },
+        methods:{
+
+        }
+
+    });
+</script>
+</body>
+</html>
